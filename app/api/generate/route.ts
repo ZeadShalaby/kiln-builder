@@ -22,6 +22,27 @@ interface PlanResponse {
   plan: string[];
 }
 
+// Static demo plan used when the Anthropic account has no credit left.
+// Lets the rest of the app (UI, integrations picker, etc.) keep working
+// end-to-end without a live model call.
+const FALLBACK_PLAN: PlanResponse = {
+  overview:
+    "This is a sample build plan shown because the connected Anthropic account is out of credit. It illustrates the shape of a real response — once credits are added, this screen will show a plan generated specifically from your prompt.",
+  features: [
+    "Example feature one (placeholder)",
+    "Example feature two (placeholder)",
+    "Example feature three (placeholder)",
+    "Example feature four (placeholder)",
+  ],
+  techStack: ["Next.js", "TypeScript", "Anthropic API", "Tailwind CSS"],
+  plan: [
+    "Add credit to the Anthropic account (Console → Plans & Billing)",
+    "Re-run this prompt to get a real, tailored plan",
+    "Wire up the selected integrations",
+    "Ship an MVP based on the generated plan",
+  ],
+};
+
 function buildSystemPrompt(selected: ReturnType<typeof integrationsById>): string {
   const base = [
     "You are Kiln, an assistant that turns a one-line product idea into a short, concrete build plan.",
@@ -85,6 +106,16 @@ function extractJson(text: string): PlanResponse | null {
   } catch {
     return null;
   }
+}
+
+// Detects the specific "credit balance too low" error the Anthropic API
+// returns (400 invalid_request_error) so we can treat it differently from
+// other failures (bad key, network issue, rate limit, etc).
+function isLowBalanceError(err: unknown): boolean {
+  if (!(err instanceof Anthropic.APIError)) return false;
+  if (err.status !== 400) return false;
+  const message = err.message || "";
+  return /credit balance is too low/i.test(message);
 }
 
 export async function POST(req: NextRequest) {
@@ -153,6 +184,24 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
+    if (isLowBalanceError(err)) {
+      // Don't fail the request — return a static demo plan plus a clear
+      // notice so the UI can show "sample data, add credit to go live"
+      // instead of an error screen.
+      return NextResponse.json({
+        plan: FALLBACK_PLAN,
+        fallback: true,
+        notice:
+          "Your Anthropic account has run out of credit, so this is a static sample plan, not a real model response. Add credit in Console → Plans & Billing, then try again.",
+        meta: {
+          model,
+          creativity,
+          integrations: selected.map((i) => i.name),
+          systemPrompt,
+        },
+      });
+    }
+
     const message = err instanceof Error ? err.message : "Unknown error calling the model.";
     return NextResponse.json({ error: message }, { status: 502 });
   }
