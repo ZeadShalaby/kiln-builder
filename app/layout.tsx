@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kiln — describe it, we'll forge it",
+  title: "Kiln — Describe it. Integrate it. We'll build it.",
   description:
-    "Describe what you want to build, pick your integrations, and Kiln drafts the plan — powered by Claude.",
+    "Tell us what you want to build and select the integrations you need. Our AI generates a plan powered by Claude.",
 };
 
 export default function RootLayout({

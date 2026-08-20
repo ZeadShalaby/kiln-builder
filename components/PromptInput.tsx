@@ -1,5 +1,7 @@
 "use client";
 
+import { Sparkles } from "lucide-react";
+
 const MAX_LENGTH = 1200;
 
 interface PromptInputProps {
@@ -8,31 +10,23 @@ interface PromptInputProps {
 }
 
 export default function PromptInput({ value, onChange }: PromptInputProps) {
-  const remaining = MAX_LENGTH - value.length;
-
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-2">
-        <label htmlFor="prompt" className="text-sm font-medium text-parch">
-          What do you want to build?
-        </label>
-        <span
-          className={`text-xs font-mono ${remaining < 0 ? "text-ember" : "text-muted"}`}
-        >
-          {value.length}/{MAX_LENGTH}
-        </span>
-      </div>
+      <label htmlFor="prompt" className="mb-2 block text-sm font-semibold text-ink">
+        What do you want to build?
+      </label>
       <textarea
         id="prompt"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         maxLength={MAX_LENGTH}
-        rows={5}
-        placeholder="Build a subscription dashboard that shows analytics, manages customers, and sends weekly email reports."
-        className="w-full resize-none rounded-lg border border-line bg-char/60 px-4 py-3 text-[15px] leading-relaxed text-parch placeholder:text-muted/70 outline-none transition-colors focus:border-ember/60"
+        rows={4}
+        placeholder="Build a subscription dashboard that shows analytics, manages customers, and sends email reports weekly."
+        className="w-full resize-none rounded-xl border border-line bg-white px-4 py-3.5 text-[15px] leading-relaxed text-ink placeholder:text-subtle outline-none transition-shadow focus:shadow-glow"
       />
-      <p className="mt-2 text-xs text-muted">
-        Be specific about features, users, and goals — it changes the plan you get back.
+      <p className="mt-2 flex items-center gap-1.5 text-xs text-subtle">
+        <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
+        Be specific about features, users, and goals for better results.
       </p>
     </div>
   );

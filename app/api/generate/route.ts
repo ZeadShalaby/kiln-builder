@@ -6,10 +6,13 @@ export const runtime = "nodejs";
 
 const MAX_PROMPT_LENGTH = 1200;
 const VALID_IDS: IntegrationId[] = ["stripe", "shopify", "gmail", "slack", "sheets"];
+const CREATIVITY_TEMPERATURES = { focused: 0.25, balanced: 0.7, creative: 1.0 } as const;
+type Creativity = keyof typeof CREATIVITY_TEMPERATURES;
 
 interface GenerateRequestBody {
   prompt?: unknown;
   integrations?: unknown;
+  creativity?: unknown;
 }
 
 interface PlanResponse {
@@ -57,6 +60,11 @@ function isValidIntegrationId(value: unknown): value is IntegrationId {
   return typeof value === "string" && (VALID_IDS as string[]).includes(value);
 }
 
+function resolveCreativity(value: unknown): Creativity {
+  if (value === "focused" || value === "balanced" || value === "creative") return value;
+  return "balanced";
+}
+
 function extractJson(text: string): PlanResponse | null {
   const trimmed = text.trim();
   const withoutFences = trimmed.replace(/^```(json)?/i, "").replace(/```$/, "").trim();
@@ -101,6 +109,7 @@ export async function POST(req: NextRequest) {
   const rawIds = Array.isArray(body.integrations) ? body.integrations : [];
   const integrationIds = rawIds.filter(isValidIntegrationId);
   const selected = integrationsById(integrationIds);
+  const creativity = resolveCreativity(body.creativity);
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -118,6 +127,7 @@ export async function POST(req: NextRequest) {
     const message = await anthropic.messages.create({
       model,
       max_tokens: 1024,
+      temperature: CREATIVITY_TEMPERATURES[creativity],
       system: systemPrompt,
       messages: [{ role: "user", content: prompt }],
     });
@@ -137,6 +147,7 @@ export async function POST(req: NextRequest) {
       plan,
       meta: {
         model,
+        creativity,
         integrations: selected.map((i) => i.name),
         systemPrompt,
       },

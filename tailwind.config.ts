@@ -8,39 +8,50 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        char: "#14110F",
-        surface: "#1D1914",
-        surface2: "#26201A",
-        line: "#3A322A",
-        ember: "#FF5A2E",
-        amber: "#FFB020",
-        parch: "#F3EEE4",
-        muted: "#9C948A",
+        ink: "#131126",
+        muted: "#6B6880",
+        subtle: "#8B879C",
+        line: "#E7E3F4",
+        card: "#FFFFFF",
+        violet: {
+          DEFAULT: "#6D4CF2",
+          dark: "#5B3AE0",
+          light: "#8A6FF5",
+        },
+        panel: "#0E0C1A",
+        panel2: "#171429",
+        panelLine: "#2B2740",
       },
       fontFamily: {
-        display: ["Iowan Old Style", "Palatino Linotype", "Georgia", "ui-serif", "serif"],
+        display: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Inter", "sans-serif"],
         body: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Inter", "sans-serif"],
         mono: ["SF Mono", "IBM Plex Mono", "ui-monospace", "Menlo", "monospace"],
       },
       boxShadow: {
-        glow: "0 0 40px rgba(255, 90, 46, 0.25)",
+        card: "0 1px 2px rgba(19, 17, 38, 0.04), 0 12px 32px -12px rgba(109, 76, 242, 0.18)",
+        glow: "0 0 0 4px rgba(109, 76, 242, 0.10)",
       },
       backgroundImage: {
-        grain: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 0)",
+        hero: "radial-gradient(circle at 18% 20%, rgba(196, 181, 253, 0.55), transparent 45%), radial-gradient(circle at 85% 15%, rgba(253, 224, 191, 0.5), transparent 40%), linear-gradient(180deg, #FBFAFF 0%, #F7F5FD 100%)",
       },
       keyframes: {
-        flicker: {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.85" },
-        },
         rise: {
           "0%": { opacity: "0", transform: "translateY(14px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        pulseDot: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.4" },
+        },
+        sparkle: {
+          "0%, 100%": { transform: "rotate(0deg) scale(1)" },
+          "50%": { transform: "rotate(8deg) scale(1.08)" },
+        },
       },
       animation: {
-        flicker: "flicker 3.2s ease-in-out infinite",
-        rise: "rise 0.6s ease-out both",
+        rise: "rise 0.5s ease-out both",
+        pulseDot: "pulseDot 2s ease-in-out infinite",
+        sparkle: "sparkle 3.5s ease-in-out infinite",
       },
     },
   },
